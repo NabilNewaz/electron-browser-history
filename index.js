@@ -1,10 +1,11 @@
 const path = require("path");
 const fs = require("fs");
-const Database = require("sqlite-async");
+// const Database = require("sqlite-async");
 const uuidV4 = require("uuid").v4;
 
 const browsers = require("./browsers");
 const { tmpdir } = require("os");
+const Database = require("better-sqlite3");
 
 /**
  * Get the path to the temp directory of
@@ -45,9 +46,9 @@ async function getBrowserHistory(paths = [], browserName, historyTimeLength) {
 }
 
 async function getHistoryFromDb(dbPath, sql, browserName) {
-    const db = await Database.open(dbPath);
+    const db = new Database(dbPath);
     try {
-        const rows = await db.all(sql);
+        const rows = db.prepare(sql).all();
         let browserHistory = rows.map(row => {
             return {
                 title: row.title,
@@ -56,10 +57,10 @@ async function getHistoryFromDb(dbPath, sql, browserName) {
                 browser: browserName,
             };
         });
-        await db.close();
+        db.close(browserHistory);
         return browserHistory;
     } catch (error) {
-        await db.close();
+        db.close();
         return [];
     }
 }
@@ -75,19 +76,21 @@ function copyDbAndWalFile(dbPath, fileExtension = 'sqlite') {
 }
 
 async function forceWalFileDump(tmpDbPath) {
-    const db = await Database.open(tmpDbPath);
+    const db = new Database(tmpDbPath);
 
     // If the browser uses a wal file we need to create a wal file with the same filename as our temp database.
-    await db.run("PRAGMA wal_checkpoint(FULL)");
-    await db.close();
+    await db.pragma('wal_checkpoint(FULL)')
+    // await db.run("PRAGMA wal_checkpoint(FULL)");
+    db.close();
 }
 
 function deleteTempFiles(paths) {
     paths.forEach(path => {
         try {
             fs.unlinkSync(path);
+            fs.unlinkSync(path + '-wal');
         } catch (error) {
-            console.log(error)
+            // console.log(error)
         }
     })
 }

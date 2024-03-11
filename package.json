@@ -1,6 +1,6 @@
 {
   "name": "electron-browser-history",
-  "version": "1.0.4",
+  "version": "2.0.1",
   "description": "This package aims to retrieve browser history from all browsers on the user's computer using electronJS. It's not required Node-gyp or any C/C++. It will attempt to read from some common locations.",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
   "author": "Nabil Newaz",
   "license": "ISC",
   "dependencies": {
-    "sqlite-async": "github:tance77/sqlite-async",
+    "better-sqlite3": "^9.4.3",
     "uuid": "^8.1.0"
   }
 }

@@ -3,7 +3,7 @@ let history = require("./index");
 function testGetAllHistory() {
     console.log("***** RUNNING GET ALL HISTORY TEST *****");
     return new Promise(res => {
-        history.getAllHistory(10).then(browsers => {
+        history.getAllHistory().then(browsers => {
             history = []
             for (let browser of browsers) {
                 for (let record of browser) {
